@@ -1,11 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+
+import Alert from "@mui/material/Alert";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+
+        <Alert severity="info">Mensagem informativa!</Alert>
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
