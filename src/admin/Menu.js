@@ -11,61 +11,43 @@ import AddAlarmIcon from "@mui/icons-material/AddAlarm";
 import PetsIcon from "@mui/icons-material/Pets";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 
+import { Link } from "react-router-dom";
+
 export const mainListItems = (
   <div>
-    <ListItem button>
+    <ListItem button component={Link} to="/">
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
-      <ListItemText primary="Dashboard" />
+      <ListItemText primary="Home" />
     </ListItem>
-    <ListItem button>
+
+    <ListItem button component={Link} to="/agendamentos">
       <ListItemIcon>
         <AddAlarmIcon />
       </ListItemIcon>
       <ListItemText primary="Agendamentos" />
     </ListItem>
-    <ListItem button>
+
+    <ListItem button component={Link} to="/clientes">
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
       <ListItemText primary="Clientes" />
     </ListItem>
-    <ListItem button>
+
+    <ListItem button component={Link} to="/petshop">
       <ListItemIcon>
         <PetsIcon />
       </ListItemIcon>
       <ListItemText primary="Pet Shop" />
     </ListItem>
-    <ListItem button>
+
+    <ListItem button component={Link} to="/servicos">
       <ListItemIcon>
         <SettingsApplicationsIcon />
       </ListItemIcon>
       <ListItemText primary="Serviços" />
-    </ListItem>
-  </div>
-);
-
-export const secondaryListItems = (
-  <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
     </ListItem>
   </div>
 );
