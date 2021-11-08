@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Paper, Typography, TextField, Grid } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,26 +12,40 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+import axios from "axios";
+
+// const rows = [
+//   { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
+//   { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
+//   { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
+//   { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
+//   { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
+//   { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
+//   { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
+//   { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
+//   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
+// ];
 
 export default function Clientes() {
+  let carregaApi = true;
+
   const [estadoDaModal, setNovoEstadoDaModal] = useState(false);
   const [registroSelecionado, setRegistroSelecionado] = useState({});
   const [editarForm, setEditarForm] = useState(false);
 
-  const abrirModal = function () {
-    setNovoEstadoDaModal(true);
+  const [clientes, setClientes] = useState([]);
+
+  const loadClients = async function () {
+    if (carregaApi == false) {
+      return false;
+    }
+    const { data } = await axios.get("https://reqres.in/api/users?page=2");
+    setClientes(data.data);
+    carregaApi = false;
   };
+
+  useEffect(loadClients);
+
   const fecharModal = function () {
     setNovoEstadoDaModal(false);
   };
@@ -50,20 +64,20 @@ export default function Clientes() {
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Nome</TableCell>
-            <TableCell>Idade</TableCell>
+            <TableCell>Email</TableCell>
             <TableCell>Ações</TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {rows.map(function (element) {
+          {clientes.map(function (element) {
             return (
               <TableRow key={element.id}>
                 <TableCell>{element.id}</TableCell>
                 <TableCell>
-                  {element.firstName} {element.lastName}
+                  {element.first_name} {element.last_name}
                 </TableCell>
-                <TableCell>{element.age}</TableCell>
+                <TableCell>{element.email}</TableCell>
                 <TableCell>
                   <Button
                     variant="outlined"

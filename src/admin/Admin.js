@@ -22,6 +22,7 @@ import Clientes from "./Clientes";
 import Agendamentos from "./Agendamentos";
 import PetShop from "./PetShop";
 import Servicos from "./Servicos";
+import Login from "./login";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
@@ -129,11 +130,6 @@ function DashboardContent() {
               >
                 Painel Administrativo
               </Typography>
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" open={open}>
@@ -168,6 +164,10 @@ function DashboardContent() {
             <Toolbar />
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
               <Switch>
+                <Route path="/login">
+                  <Login />
+                </Route>
+
                 <Route path="/agendamentos">
                   <Agendamentos />
                 </Route>
