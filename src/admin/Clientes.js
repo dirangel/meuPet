@@ -27,7 +27,7 @@ import axios from "axios";
 // ];
 
 export default function Clientes() {
-  let carregaApi = true;
+  const [carregando, setCarregando] = useState(false);
 
   const [estadoDaModal, setNovoEstadoDaModal] = useState(false);
   const [registroSelecionado, setRegistroSelecionado] = useState({});
@@ -35,16 +35,17 @@ export default function Clientes() {
 
   const [clientes, setClientes] = useState([]);
 
-  const loadClients = async function () {
-    if (carregaApi == false) {
-      return false;
+  // const loadClients = async
+
+  useEffect(async function () {
+    if (carregando == true) {
+      return true;
     }
+    setCarregando(true);
+
     const { data } = await axios.get("https://reqres.in/api/users?page=2");
     setClientes(data.data);
-    carregaApi = false;
-  };
-
-  useEffect(loadClients);
+  });
 
   const fecharModal = function () {
     setNovoEstadoDaModal(false);
