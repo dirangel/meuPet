@@ -9,15 +9,19 @@ import Box from "@mui/material/Box";
 import PetsIcon from "@mui/icons-material/Pets";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
+
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { login } from "../model/login";
-import Alert from "@mui/material/Alert";
 import { useState } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const theme = createTheme();
 
-export default function SignIn() {
+export default function SignIn(props) {
+  const { logado } = props;
   const [erro, setErro] = useState();
+  const [carregando, setCarregando] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,10 +30,13 @@ export default function SignIn() {
     setErro(false);
 
     try {
+      setCarregando(true);
       const token = await login(data.get("email"), data.get("password"));
-      console.log("Token: ", token);
+      logado(token);
     } catch (error) {
       setErro(true);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -82,14 +89,15 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Lembre-me"
             />
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              loading={carregando}
             >
               entrar
-            </Button>
+            </LoadingButton>
             {erro === true ? (
               <Alert severity="error">Usuário ou senha incorreto!</Alert>
             ) : (

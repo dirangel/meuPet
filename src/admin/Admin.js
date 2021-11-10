@@ -102,7 +102,7 @@ function DashboardContent() {
   const [logado, setLogado] = useState(false);
 
   if (logado == false) {
-    return <Login />;
+    return <Login logado={setLogado} />;
   } else {
     return (
       <Router>
