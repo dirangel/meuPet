@@ -103,11 +103,16 @@ function DashboardContent() {
 
   const [logado, setLogado] = useState();
 
-  useEffect(function () {
-    const session = usuarioLogado();
+  let alterado = false;
 
-    setLogado(session);
-  });
+  useEffect(
+    function () {
+      const session = usuarioLogado();
+
+      setLogado(session);
+    },
+    [alterado]
+  );
 
   function logout() {
     logoutSession();
