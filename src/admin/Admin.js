@@ -15,7 +15,7 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { mainListItems, secondaryListItems } from "./Menu";
+import { mainListItems } from "./Menu";
 
 import Home from "./Dashboard";
 import Clientes from "./Clientes";
@@ -25,7 +25,8 @@ import Servicos from "./Servicos";
 import Login from "./Login";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usuarioLogado } from "../model/login";
 
 function Copyright(props) {
   return (
@@ -100,6 +101,12 @@ function DashboardContent() {
   };
 
   const [logado, setLogado] = useState(false);
+  useEffect(function () {
+    const session = usuarioLogado();
+    if (session != null) {
+      setLogado(true);
+    }
+  });
 
   if (logado == false) {
     return <Login logado={setLogado} />;
