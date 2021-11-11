@@ -16,6 +16,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { mainListItems } from "./Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import Home from "./Dashboard";
 import Clientes from "./Clientes";
@@ -26,7 +27,7 @@ import Login from "./Login";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { usuarioLogado } from "../model/login";
+import { usuarioLogado, logout as logoutSession } from "../model/login";
 
 function Copyright(props) {
   return (
@@ -108,6 +109,11 @@ function DashboardContent() {
     }
   });
 
+  function logout() {
+    logoutSession();
+    setLogado(false);
+  }
+
   if (logado == false) {
     return <Login logado={setLogado} />;
   } else {
@@ -141,8 +147,14 @@ function DashboardContent() {
                   noWrap
                   sx={{ flexGrow: 1, textAlign: "center" }}
                 >
-                  Painel
+                  Painel Administrativo
                 </Typography>
+                <IconButton color="inherit" onClick={logout}>
+                  <Typography component="h5" style={{ margin: "10px" }}>
+                    Usuário
+                  </Typography>
+                  <LogoutIcon />
+                </IconButton>
               </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>
