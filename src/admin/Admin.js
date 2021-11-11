@@ -101,20 +101,20 @@ function DashboardContent() {
     setOpen(!open);
   };
 
-  const [logado, setLogado] = useState(false);
+  const [logado, setLogado] = useState();
+
   useEffect(function () {
     const session = usuarioLogado();
-    if (session != null) {
-      setLogado(true);
-    }
+
+    setLogado(session);
   });
 
   function logout() {
     logoutSession();
-    setLogado(false);
+    setLogado(null);
   }
 
-  if (logado == false) {
+  if (logado == null) {
     return <Login logado={setLogado} />;
   } else {
     return (
@@ -149,9 +149,10 @@ function DashboardContent() {
                 >
                   Painel Administrativo
                 </Typography>
+
                 <IconButton color="inherit" onClick={logout}>
                   <Typography component="h5" style={{ margin: "10px" }}>
-                    Usuário
+                    {logado.email}
                   </Typography>
                   <LogoutIcon />
                 </IconButton>

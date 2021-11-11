@@ -15,15 +15,14 @@ export async function login(email, senha) {
   const { data } = await axios.post("https://reqres.in/api/login", login);
   console.log("data: ", data);
 
-  if (data.token) {
-    const session = {
-      email: email,
-      token: data.token,
-    };
-    localStorage.setItem("session-login", JSON.stringify(session));
-  }
+  const session = {
+    email: email,
+    token: data.token,
+  };
 
-  return data.token;
+  localStorage.setItem("session-login", JSON.stringify(session));
+
+  return session;
 }
 
 // login("tobias.funke@reqres.in", "123456");

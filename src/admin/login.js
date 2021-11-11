@@ -31,7 +31,9 @@ export default function SignIn(props) {
 
     try {
       setCarregando(true);
+
       const token = await login(data.get("email"), data.get("password"));
+
       logado(token);
     } catch (error) {
       setErro(true);
