@@ -1,7 +1,13 @@
-import axios from "axios";
-import { token } from "./login";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCy8nw9cQK9904JXu3pl7pEgPoE6iAIg_k",
@@ -15,32 +21,59 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const API_URL = "https://reques.in/api/users";
+const db = getFirestore(app);
+
+// const API_URL = "https://reques.in/api/users";
 
 export async function listar() {
-  let page = 1;
-  let total_pages = null;
-  let dados = [];
+  const col = collection(db, "clientes");
+  const docs = await getDocs(col);
 
-  const Token = token();
-  const config = {
-    headers: { authorization: Token },
-  };
+  const clientes = docs.docs.map(function (item) {
+    let dados = item.data();
+    dados.id = item.id;
+    return dados;
+  });
 
-  do {
-    const { data } = await axios.get(API_URL + "?page" + page, config);
-
-    total_pages = data.total_pages;
-
-    dados = dados.concat(data.data);
-    page++;
-  } while (total_pages >= page);
-
-  return dados;
+  return clientes;
 }
 
-export function deletar() {}
+/**
+ * deleta um cliente no firebase
+ * @param string id
+ * @returns
+ */
+export async function deletar(id) {
+  const cliente = doc(db, "clientes", id);
 
-export function editar() {}
+  const retorno = await deleteDoc(cliente);
 
-export function criar() {}
+  return retorno;
+}
+
+/**
+ * Altera um registro no bd
+ * @param string id
+ * @param JSON dados
+ * @returns JSON com objeto do BD
+ */
+export async function editar(id, dados) {
+  const cliente = doc(db, "clientes", id);
+
+  const novo = await setDoc(cliente, dados);
+
+  return novo;
+}
+
+/**
+ * Add um cliente
+ * @param JSON dados
+ * @returns JSON com objeto do BD
+ */
+export async function criar(dados) {
+  const col = collection(db, "clientes");
+
+  const cliente = await addDoc(col, dados);
+
+  return cliente;
+}

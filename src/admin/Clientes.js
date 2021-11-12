@@ -1,46 +1,69 @@
-import { useState, useEffect } from "react";
-import { Paper, Typography, TextField, Grid } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+  DialogActions,
+  TextField,
+  Grid,
+  Box,
+} from "@mui/material";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+//import TableContainer from '@mui/material/TableContainer';
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
-import axios from "axios";
+import { useState, useEffect, createRef } from "react";
+
+import {
+  listar as listarClientes,
+  deletar as modelDeletar,
+  criar,
+  editar,
+} from "../model/clientes";
+
+// MVC
+// CRUD
 
 export default function Clientes() {
   const [carregando, setCarregando] = useState(false);
 
-  const [estadoDaModal, setNovoEstadoDaModal] = useState(false);
+  const [deletarOpen, setDeletarOpen] = useState(false);
   const [registroSelecionado, setRegistroSelecionado] = useState({});
   const [editarForm, setEditarForm] = useState(false);
 
   const [clientes, setClientes] = useState([]);
 
-  // const loadClients = async
+  const novoRegistro = function () {
+    setEditarForm(true);
+    setRegistroSelecionado({});
+  };
 
-  useEffect(async function () {
-    if (carregando == true) {
-      return true;
+  const loadClients = async function () {
+    if (carregando === true) {
+      return;
     }
+
     setCarregando(true);
+    const data = await listarClientes();
 
-    const { data } = await axios.get("https://reqres.in/api/users?page=2");
-    setClientes(data.data);
-  });
+    setClientes(data);
+  };
 
-  const fecharModal = function () {
-    setNovoEstadoDaModal(false);
+  // hook executado ao renderizar
+  useEffect(loadClients);
+
+  const fecharDeletar = function () {
+    setDeletarOpen(false);
   };
-  const fecharEditarForm = function () {
-    setEditarForm(false);
-  };
+
+  const fecharEditarForm = () => setEditarForm(false);
 
   return (
     <Paper>
@@ -48,50 +71,52 @@ export default function Clientes() {
         Clientes
       </Typography>
 
+      <Button
+        variant="contained"
+        sx={{ float: "right", mr: 2 }}
+        onClick={novoRegistro}
+      >
+        Novo Cliente
+      </Button>
+
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Nome</TableCell>
-            <TableCell>Email</TableCell>
+            <TableCell>email</TableCell>
             <TableCell>Ações</TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {clientes.map(function (element) {
+          {clientes.map(function (elem) {
             return (
-              <TableRow key={element.id}>
-                <TableCell>{element.id}</TableCell>
+              <TableRow key={elem.id}>
+                <TableCell>{elem.id}</TableCell>
                 <TableCell>
-                  {element.first_name} {element.last_name}
+                  {elem.first_name} {elem.last_name}
                 </TableCell>
-                <TableCell>{element.email}</TableCell>
+                <TableCell>{elem.email}</TableCell>
                 <TableCell>
                   <Button
                     variant="outlined"
-                    color="success"
-                    style={{ margin: "5px" }}
-                  >
-                    Abrir
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    style={{ margin: "5px" }}
+                    size="small"
+                    sx={{ mr: 2 }}
                     onClick={function () {
                       setEditarForm(true);
-                      setRegistroSelecionado(element);
+                      setRegistroSelecionado(elem);
                     }}
                   >
                     Editar
                   </Button>
                   <Button
                     variant="outlined"
+                    size="small"
                     color="error"
-                    style={{ margin: "5px" }}
                     onClick={function () {
-                      setRegistroSelecionado(element);
-                      setNovoEstadoDaModal(true);
+                      setRegistroSelecionado(elem);
+                      setDeletarOpen(true);
                     }}
                   >
                     Deletar
@@ -102,41 +127,63 @@ export default function Clientes() {
           })}
         </TableBody>
       </Table>
+
       <Deletar
-        abrir={estadoDaModal}
-        fechar={fecharModal}
+        open={deletarOpen}
+        onFechar={fecharDeletar}
         registro={registroSelecionado}
+        clientes={clientes}
+        modificador={setClientes}
       />
       <Cadastro
-        abrir={editarForm}
-        fechar={fecharEditarForm}
+        open={editarForm}
         registro={registroSelecionado}
+        onFechar={fecharEditarForm}
+        modificador={setClientes}
+        clientes={clientes}
       />
     </Paper>
   );
 }
 
 function Deletar(props) {
-  const { abrir, fechar, registro } = props;
+  const { open, onFechar, registro, clientes, modificador } = props;
+
+  const deletarCliente = async function () {
+    await modelDeletar(registro.id);
+
+    const novo = [];
+
+    clientes.forEach(function (item) {
+      if (item.id !== registro.id) {
+        novo.push(item);
+      }
+    });
+
+    modificador(novo);
+    onFechar();
+  };
+
   return (
     <Dialog
-      open={abrir}
-      onClose={fechar}
+      open={open}
+      onClose={onFechar}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{"Aviso!"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{"Deletar"}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Essa ação não poderá ser desfeita, deseja deletar o usuário{" "}
-          {registro.firstName} {registro.lastName}
+          Você Deseja realmente deletar o usuário: {registro.first_name}?
+          <br />
+          Essa ação não poderá ser desfeita
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button color="error" onClick={fechar}>
+        <Button color="error" onClick={deletarCliente}>
           Sim
         </Button>
-        <Button autoFocus onClick={fechar}>
+        <Button autoFocus onClick={onFechar}>
           Não
         </Button>
       </DialogActions>
@@ -145,58 +192,87 @@ function Deletar(props) {
 }
 
 function Cadastro(props) {
-  const { abrir, fechar, registro } = props;
+  const { open, onFechar, registro, modificador, clientes } = props;
+
+  // faz uma referencia a um elemento html como o getElementById
+  let formRef = createRef();
+
+  let salvaRegistro = async function () {
+    const formDados = new FormData(formRef.current);
+
+    let dados = {
+      first_name: formDados.get("firstName"),
+      last_name: formDados.get("lastName"),
+      email: formDados.get("email"),
+    };
+
+    if (!registro.first_name) {
+      const doc = await criar(dados);
+
+      dados.id = doc.id;
+      clientes.push(dados);
+      modificador(clientes);
+    } else {
+      const doc = await editar(registro.id, dados);
+      const novo = clientes.map(function (item) {
+        if (item.id === registro.id) {
+          dados.id = registro.id;
+          return dados;
+        }
+      });
+
+      modificador(novo);
+    }
+
+    onFechar();
+  };
+
   return (
     <Dialog
-      open={abrir}
-      onClose={fechar}
+      open={open}
+      onClose={onFechar}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Alterar Registro</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {registro.first_name ? "Edição do Registro" : "Novo registro"}
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText
-          id="alert-dialog-description"
-          style={{ margin: "10px" }}
-        >
-          Edição de Registro
-        </DialogContentText>
-        <Grid container>
-          <Grid item xs={4}>
-            <TextField
-              style={{ margin: "10px" }}
-              id="outlined-basic"
-              label="Nome"
-              variant="outlined"
-              id="firstName"
-              value={registro.firstName}
-            />
+        <Box component="form" ref={formRef} noValidate sx={{ mt: 1 }}>
+          <Grid container>
+            <Grid item xs={6}>
+              <TextField
+                label="Nome"
+                variant="outlined"
+                name="firstName"
+                value={registro.first_name}
+                sx={{ m: 1 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Sobrenome"
+                variant="outlined"
+                name="lastName"
+                value={registro.last_name}
+                sx={{ m: 1 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Email"
+                variant="outlined"
+                name="email"
+                value={registro.email}
+                sx={{ m: 1 }}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={4}>
-            <TextField
-              style={{ margin: "10px" }}
-              id="outlined-basic"
-              label="Sobrenome"
-              variant="outlined"
-              id="lastName"
-              value={registro.lastName}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              style={{ margin: "10px" }}
-              id="outlined-basic"
-              label="Idade"
-              variant="outlined"
-              id="age"
-              value={registro.age}
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="error">Sim</Button>
-        <Button autoFocus>Não</Button>
+        <Button onClick={salvaRegistro}>Sim</Button>
+        <Button onClick={onFechar}>Não</Button>
       </DialogActions>
     </Dialog>
   );
